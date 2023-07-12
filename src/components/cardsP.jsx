@@ -14,7 +14,7 @@ const CardsP = ({ results }) => {
         let { id, images, title, price} = x;
         return(
             <Card key={id} sx={{width: '15%'}}>
-              <CardActionArea component={Link} to={`/categorie/${id}`}>
+              <CardActionArea component={Link} to={`/products/${id}`}>
                 <CardMedia
                     component="img"
                     image={images['0']}

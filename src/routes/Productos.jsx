@@ -10,11 +10,12 @@ export default function Productos() {
     const [productos, updateProductos] = useState([]);
     const [categorias, updateCategorias] = useState([]);
     const [checked, setChecked] = useState(window.filtro.name);
-
+    const [checkedP, setCheckedP] = useState(undefined);
+    const filtroP = ['$0 - $500', '$500 - $5000', '$5000 - $10000', '$ + 10000']
 
     function onChange(i) {
       setChecked((prev) => (i === prev ? null : i));
-      if (checked === null){
+      if (checked === null | checked === undefined){
       updateNameprod(productos.filter(pre => {
         return pre.category.name === i 
       }))}
@@ -23,8 +24,7 @@ export default function Productos() {
       }
     }
         
-    
-    const Filters = () => {
+    const FiltersCat = () => {
       let display = categorias.map((x) => {
           return(
           <FormControlLabel
@@ -46,8 +46,40 @@ export default function Productos() {
       </FormControl>
       )
     }
-       
     
+    function onChangeP(i) {
+      setCheckedP((prev) => (i === prev ? null : i));
+      if (checkedP === null | checkedP === undefined){
+      updateNameprod(productos.filter(pre => {
+        return pre.price > 0 && pre.price <= 500
+      }))}
+      else {
+        updateNameprod(productos)
+      }
+    }
+
+    const FiltersPrice = () => {
+      let display = filtroP.map((x) => {
+          return(
+          <FormControlLabel
+          control={
+            <Checkbox name={x} 
+            onChange={() => onChangeP(x)}
+            checked={x === checkedP}
+            />
+          }
+          label={x}
+        />)
+        })
+        return(
+        <FormControl sx={{ m: 3, marginX:'2', mr:7 }} component="fieldset" variant="standard">
+        <FormLabel sx={{color:'#ffffff'}} >Rango de precios</FormLabel>
+        <FormGroup>
+          <>{display}</>
+        </FormGroup>
+      </FormControl>
+      )
+    }
 
   useEffect(() => {
       const fetchCategorias = async () => {
@@ -97,7 +129,11 @@ export default function Productos() {
         </Box>
         </Box>
         <Stack spacing={2} direction={'row'}> 
-        <Filters></Filters>
+        <Box spacing={2}>
+        <Typography>Filtros</Typography>
+        <FiltersCat></FiltersCat>
+        <FiltersPrice></FiltersPrice>
+        </Box>
         <Stack
         sx={{ p: 10 }}
         spacing={2}

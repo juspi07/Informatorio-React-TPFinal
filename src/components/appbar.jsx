@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, {useEffect, useState} from "react";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -10,9 +10,9 @@ import InputBase from "@mui/material/InputBase";
 import Badge from "@mui/material/Badge";
 import Button from "@mui/material/Button";
 import SearchIcon from "@mui/icons-material/Search";
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -55,6 +55,35 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function Appbar() {
+  const navigate = useNavigate();
+
+  const Logout = () => {
+    window.Atoken = ''
+    navigate('/')
+  }
+  
+  const Login = () => {
+    if (window.Atoken !== "") {
+      return (
+        <Box sx={{ display: { xs: "none", md: "flex" } }}>
+          <IconButton size="large" color="inherit">
+            <Badge badgeContent={4} color="error">
+              <ShoppingCartIcon />
+            </Badge>
+          </IconButton>
+          <Button color="inherit">Administrar</Button>
+          <Button onClick={() => Logout()} color="inherit">Salir</Button>
+        </Box>
+      );
+    }
+    else {
+      return(
+      <Box sx={{ display: { xs: "none", md: "flex" } }}>
+      <Button component={Link} to='/login' color="inherit">Login</Button>
+    </Box>
+    )
+    }
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -69,9 +98,15 @@ export default function Appbar() {
             Ecommerce
           </Typography>
           <Stack sx={{ ml: 3 }} direction={"row"} spacing={3}>
-            <Button component={Link} to={`/products`} color="inherit">Shop</Button>
-            <Button component={Link} color="inherit">Stories</Button>
-            <Button component={Link} color="inherit">About</Button>
+            <Button component={Link} to={`/products`} color="inherit">
+              Shop
+            </Button>
+            <Button component={Link} color="inherit">
+              Stories
+            </Button>
+            <Button component={Link} color="inherit">
+              About
+            </Button>
           </Stack>
           <Search>
             <SearchIconWrapper>
@@ -83,19 +118,11 @@ export default function Appbar() {
             />
           </Search>
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <IconButton
-              size="large"
-              color="inherit"
-            >
-              <Badge badgeContent={4} color="error">
-                <ShoppingCartIcon />
-              </Badge>
-            </IconButton>
-            <Button color="inherit">Login</Button>
-          </Box>
+
+          <Login />
         </Toolbar>
       </AppBar>
     </Box>
   );
+  
 }

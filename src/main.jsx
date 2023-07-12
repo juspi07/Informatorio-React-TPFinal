@@ -14,6 +14,7 @@ import EditProducto from "./routes/EditProducto"
 import Carrito from "./routes/Carrito"
 
 window.filtro = "";
+window.Atoken = "";
 
 const theme = createTheme({
   palette: {
@@ -76,5 +77,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <ThemeProvider theme={theme}>
       <RouterProvider router={router} />
     </ThemeProvider>
-  </React.StrictMode>,
+  </React.StrictMode>, 
 )
