@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { Link, redirect } from "react-router-dom";
 import Appbar from "../components/appbar";
+import { useMutation } from "react-query";
 
 
 export default function AddProducto() {
@@ -26,39 +27,47 @@ export default function AddProducto() {
     const [errores, setErrores] = useState([false, false, false, false])   
    
     
-    const handleSubmit = async (event) => {
-        try {
-            event.preventDefault();
-            await fetch("https://api.escuelajs.co/api/v1/products/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                "title": product.title,
-                "price": product.price,
-                "description": product.description,
-                "categoryId": product.categoryId,
-                "images": [product.images]
-            }),
-          })
-            .then((response) => response.json())
-            .then((json) => {
-                if (json.error == 'Bad Request') {
-                    let aux = [...errores]
-                    for (let index = 0; index < json.message.length; index++) {
-                        if (json.message[index] == "title should not be empty"){aux[0] = true}
-                        if (json.message[index] == "price must be a positive number"){aux[1] = true}
-                        if (json.message[index] == "description should not be empty"){aux[2] = true}
-                        if (json.message[index] == "each value in images must be a URL address"){aux[3] = true}  
-                    }
-                    setErrores(aux)
-                } else {
-                setFlag(!flag)
-                setProduct({title: "",price: "",description: "",categoryId: "",images: ""})
-                redirect('/products/create')}
-            });
-        } catch (err) { console.log(err)}
-    };
-  
+    const PostData = async () => {
+      const response = await fetch(
+        `https://api.escuelajs.co/api/v1/products/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          "title": product.title,
+          "price": product.price,
+          "description": product.description,
+          "categoryId": product.categoryId,
+          "images": [product.images]
+        }),
+      });
+      return await response.json();
+    }
+
+    const { mutate: doPost } = useMutation(PostData, {
+      onError: (err) => console.log("The error", err),
+      onSuccess: (json) => {
+        if (json.error == 'Bad Request') {
+          let aux = [...errores]
+          for (let index = 0; index < json.message.length; index++) {
+              if (json.message[index] == "title should not be empty"){aux[0] = true}
+              if (json.message[index] == "price must be a positive number"){aux[1] = true}
+              if (json.message[index] == "description should not be empty"){aux[2] = true}
+              if (json.message[index] == "each value in images must be a URL address"){aux[3] = true}  
+          }
+          setErrores(aux)
+        } else {
+          setFlag(!flag)
+          setProduct({title: "",price: "",description: "",categoryId: "",images: ""})
+          redirect('/products/create')}
+      }
+    })
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      doPost({ cat })
+      }
     
     useEffect(() => {
       if (!localStorage.getItem('Atoken')) {

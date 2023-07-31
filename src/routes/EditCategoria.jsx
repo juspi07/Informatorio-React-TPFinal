@@ -10,6 +10,7 @@ import {
   Dialog, DialogActions,DialogContent ,DialogContentText, DialogTitle
 } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery, useMutation } from "react-query";
 import Appbar from "../components/appbar";
 
 
@@ -27,63 +28,88 @@ export default function EditCategoria() {
     const [open, setOpen] = useState(false);
    
     
-    const handleSubmit = async (event) => {
-        try {
-            event.preventDefault();
-            await fetch(`https://api.escuelajs.co/api/v1/categories/${parm.id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                "id": cat.id,
-                "name": cat.name,
-                "image": cat.image,
-            }),
-          })
-            .then((response) => response.json())
-            .then((json) => {
-                if (json.error == 'Bad Request') {
-                  setMsg('La imagen debe ser una URL')
-                  setFlag(!flag)
-                } else {
-                  setMsg('Categoria modificada')
-                  setFlag1(!flag1)
-                }
-            });
-        } catch (err) { console.log(err)}
-    };
-  
-    const handleDelete = async () => {
-      await fetch(`https://api.escuelajs.co/api/v1/categories/${parm.id}`, {
-          method: "DELETE"})
-          .then((response) => response.json())
-          .then((json) => {
-              if (json == true) {
-                  setMsg("Categoria eliminado correctamente");
-                  setOpen(!open)
-                  setFlag(!flag1)
-                  setTimeout(() => {
-                      navigate('/categories')
-                  }, "2000")
-              } else {
-                  console.log(json)
-              }
-          })
-  
-    };
+    const PostData = async () => {
+      const response = await fetch(
+        `https://api.escuelajs.co/api/v1/categories/${parm.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          "id": cat.id,
+          "name": cat.name,
+          "image": cat.image,
+        }),
+      });
+      return await response.json();
+    }
 
+    const { mutate: doPost } = useMutation(PostData, {
+      onError: (err) => console.log("The error", err),
+      onSuccess: (D) => {
+        if (D.error == 'Bad Request') {
+          setMsg('La imagen debe ser una URL')
+          setFlag(!flag)
+        } else {
+          setMsg('Categoria modificada')
+          setFlag1(!flag1)
+        }
+        }
+    })
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      doPost({ cat })
+      }
+    
+      const PostDelete = async () => {
+        const response = await fetch(
+          `https://api.escuelajs.co/api/v1/categories/${parm.id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        return await response.json();
+      }
+  
+      const { mutate: doDelete } = useMutation(PostDelete, {
+        onError: (err) => console.log("The error", err),
+        onSuccess: (D) => {
+          if (D == true) {
+            setMsg("Categoria eliminado correctamente");
+            setOpen(!open)
+            setFlag(!flag1)
+            setTimeout(() => {
+                navigate('/categories')
+            }, "2000")
+          }
+          }
+      })
+
+      const handleDelete = (e) => {
+        e.preventDefault();
+        doDelete()
+        }
+  
+
+    const FetchQuery = useQuery(
+      ["categorias"], async () => {
+        const res = await fetch(
+          `https://api.escuelajs.co/api/v1/categories/${parm.id}`)
+        const json = await res.json()
+        if (!json.id) {
+          navigate("*");
+        } else {
+        setCat(json)
+          }
+        }
+    )
+    
     useEffect(() => {
       if (!localStorage.getItem('Atoken')) {
           navigate('/')
-      } else {
-          fetch(`https://api.escuelajs.co/api/v1/categories/${parm.id}`) 
-          .then((response) => response.json())
-          .then((json) => {          
-            if (!json.id) {
-              navigate("*");
-          } else {
-            setCat(json)
-          }})
-        }
+      }
     },[])
 
 

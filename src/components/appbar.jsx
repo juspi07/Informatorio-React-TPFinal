@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useContext } from "react";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -11,8 +11,8 @@ import Badge from "@mui/material/Badge";
 import Button from "@mui/material/Button";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-
-import { useLocation , Link, useNavigate } from "react-router-dom";
+import UserContext from './context'
+import { Link, useNavigate } from "react-router-dom";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -54,31 +54,31 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-
+//carrito.length
 
 export default function Appbar() {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { carrito, setCarrito } = useContext(UserContext); 
   
   const Logout = () => {
     localStorage.clear()
     navigate('/')
   }
-  
-  const Login = () => {
-    const Admin = () => {
-      if (localStorage.getItem('Role') == 'admin') {
-        return(
-          <Button component={Link} to='/products/create' color="inherit">Alta de Producto</Button>
-        )
-      }
+
+  const Admin = () => {
+    if (localStorage.getItem('Role') == 'admin') {
+      return (
+        <Button component={Link} to='/products/create' color="inherit">Alta de Producto</Button>
+      )
     }
+  }
     
+  const Login = () => {
     if (localStorage.getItem('Atoken')) {
       return (
         <Box sx={{ display: { xs: "none", md: "flex" } }}>
-          <IconButton size="large" color="inherit">
-            <Badge badgeContent={4} color="error">
+          <IconButton component={Link} to='/cart-detail' size="large" color="inherit">
+            <Badge badgeContent={carrito.length} color="error">
               <ShoppingCartIcon />
             </Badge>
           </IconButton>
@@ -88,13 +88,13 @@ export default function Appbar() {
       );
     }
     else {
-      return(
-      <Box sx={{ display: { xs: "none", md: "flex" } }}>
-        <Button component={Link} to='/login' color="inherit">Login</Button>
-      </Box>
-    )
+      return (
+        <Box sx={{ display: { xs: "none", md: "flex" } }}>
+          <Button component={Link} to='/login' color="inherit">Login</Button>
+        </Box>
+      )
     }
-  };
+  }
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -109,14 +109,17 @@ export default function Appbar() {
             Ecommerce
           </Typography>
           <Stack sx={{ ml: 3 }} direction={"row"} spacing={3}>
+            <Button component={Link} to={`/categories`} color="inherit">
+              Categorias
+            </Button>
             <Button component={Link} to={`/products`} color="inherit">
-              Shop
+              Productos
             </Button>
-            <Button component={Link} color="inherit">
-              Stories
-            </Button>
-            <Button component={Link} color="inherit">
+            <Button onClick={() => { console.log(carrito) }} color="inherit">
               About
+            </Button>
+            <Button onClick={() => { setCarrito([]) }} color="inherit">
+              Abouts
             </Button>
           </Stack>
           <Search>
@@ -129,11 +132,10 @@ export default function Appbar() {
             />
           </Search>
           <Box sx={{ flexGrow: 1 }} />
-
           <Login />
         </Toolbar>
       </AppBar>
     </Box>
   );
-  
+
 }

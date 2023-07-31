@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import Appbar from "../components/appbar";
+import { useMutation } from "react-query";
 
 export default function EditProducto() {
   const navigate = useNavigate();
@@ -28,70 +29,91 @@ export default function EditProducto() {
   const [errores, setErrores] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const handleSubmit = async (event) => {
-    try {
-      event.preventDefault();
-      await fetch(`https://api.escuelajs.co/api/v1/products/${parm.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: product.title,
-          price: product.price,
-          description: product.description,
-          categoryId: product.categoryId,
-          images: [product.images],
-        }),
-      })
-        .then((response) => response.json())
-        .then((json) => {
-          if (json.error == "Bad Request") {
-            setMsg("La imagen debe ser una URL");
-            setFlag(!flag);
-          } else {
-            setMsg("Categoria modificada");
-            setFlag1(!flag1);
-          }
-        });
-    } catch (err) {
-      console.log(err);
+  
+  const PostData = async () => {
+    const response = await fetch(
+      `https://api.escuelajs.co/api/v1/products/${parm.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: product.title,
+        price: product.price,
+        description: product.description,
+        categoryId: product.categoryId,
+        images: [product.images],
+      }),
+    });
+    return await response.json();
+  }
+
+  const { mutate: doPost } = useMutation(PostData, {
+    onError: (err) => console.log("The error", err),
+    onSuccess: (D) => {
+      if (D.error == "Bad Request") {
+        setMsg("La imagen debe ser una URL");
+        setFlag(!flag);
+      } else {
+        setMsg("Producto modificado");
+        setFlag1(!flag1);
+      }
+      }
+  })
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    doPost({ product })
     }
-  };
 
-  const handleDelete = async () => {
-    await fetch(`https://api.escuelajs.co/api/v1/products/${parm.id}`, {
-        method: "DELETE"})
-        .then((response) => response.json())
-        .then((json) => {
-            if (json == true) {
-                setMsg("Producto eliminado correctamente");
-                setOpen(!open)
-                setFlag(!flag)
-                setTimeout(() => {
-                    navigate('/products')
-                }, "2000")
-            } else {
-                console.log(json)
-            }
-        })
+    const PostDelete = async () => {
+      const response = await fetch(
+        `https://api.escuelajs.co/api/v1/products/${parm.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      return await response.json();
+    }
 
-  };
+    const { mutate: doDelete } = useMutation(PostDelete, {
+      onError: (err) => console.log("The error", err),
+      onSuccess: (D) => {
+        if (D == true) {
+          setMsg("Producto eliminado correctamente");
+          setOpen(!open)
+          setFlag(!flag)
+          setTimeout(() => {
+              navigate('/products')
+          }, "2000")
+        }
+        }
+    })
+
+    const handleDelete = (e) => {
+      e.preventDefault();
+      doDelete()
+      }
+
+
+    useQuery(["Pro"], async () => {
+      const res = await fetch(
+        `https://api.escuelajs.co/api/v1/products/${parm.id}`)
+      const json = await res.json()
+      if (!json.id) {
+        navigate("*");
+      } else {
+        setProduct(json);
+      }
+    })
 
 
   useEffect(() => {
     if (!localStorage.getItem("Atoken")) {
-      navigate("/");
-    } else {
-      fetch(`https://api.escuelajs.co/api/v1/products/${parm.id}`)
-        .then((response) => response.json())
-        .then((json) => {
-          if (!json.id) {
-            navigate("*");
-          } else {
-            setProduct(json);
-          }
-        });
-    }
-  }, []);
+      navigate("/")
+    } 
+  },[]);
 
   return (
     <>
