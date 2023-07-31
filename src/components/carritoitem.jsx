@@ -1,6 +1,13 @@
 import { Paper, Stack, Typography, Box, Button, IconButton } from "@mui/material";
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import UserContext from '../components/context'
+import DeleteIcon from '@mui/icons-material/Delete';
+
+
+
+const DeleteItem = () => {
+    
+}
 
 
 const CarritoItem = () => {   
@@ -11,7 +18,6 @@ const CarritoItem = () => {
         display = carrito.map((x) => {
             let { id, title, cant, image, price } = x;
             let total = (cant * price)
-
             return (
                 <Stack direction='row'>
                     <Paper sx={{ backgroundColor: 'white', minWidth: 650, minHeight: 100 }}>
@@ -34,6 +40,13 @@ const CarritoItem = () => {
                                     <Typography>Total</Typography>
                                     <Typography>{total}</Typography>
                                 </Stack>
+                                <IconButton onClick={() => {
+                                    setCarrito(
+                                        carrito.filter(a => a.id !== x.id)
+                                    );
+                                }} size="large" color="inherit">
+                                    <DeleteIcon/>
+                                </IconButton>
                             </Stack>
                         </Stack>
                     </Paper>

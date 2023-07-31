@@ -115,12 +115,6 @@ export default function Appbar() {
             <Button component={Link} to={`/products`} color="inherit">
               Productos
             </Button>
-            <Button onClick={() => { console.log(carrito) }} color="inherit">
-              About
-            </Button>
-            <Button onClick={() => { setCarrito([]) }} color="inherit">
-              Abouts
-            </Button>
           </Stack>
           <Search>
             <SearchIconWrapper>
