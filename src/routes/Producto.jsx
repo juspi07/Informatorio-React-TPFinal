@@ -1,27 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Appbar from "../components/appbar";
 import { useParams } from "react-router";
-import { Typography, Stack, Box, Paper, ImageListItem, ImageList } from "@mui/material";
+import { Typography, Stack, Box, TextField, ImageListItem, ImageList, Button } from "@mui/material";
 import { Image } from "mui-image";
+import { useQuery, useMutation } from "react-query";
+import { useNavigate } from "react-router-dom";
+import UserContext from '../components/context'
 
 export default function Producto() {
   const params = useParams();
+  const navigate = useNavigate()
   const [productos, updateProductos] = useState([]);
+  const [uni, setUni] = useState(1)
+  const {carrito, setCarrito} = useContext(UserContext);
   const api = `https://api.escuelajs.co/api/v1`;
-
-  useEffect(() => {
-    const fetchProductos = async () => {
+  
+  const fetchProductos = useQuery(['Prod'], async () => {
       try {
         await fetch(api + `/products/${params.id}`)
           .then((res) => res.json())
           .then((obj) => {
             updateProductos(obj);
           });
-      } catch (err) {}
-    };
-    fetchProductos();
-  }, []);
-
+      } catch (err) {navigate('*')}
+    })
+  
   const ListaImg = () => {
     if (productos.length !== 0) {
         return(
@@ -38,7 +41,25 @@ export default function Producto() {
     )}
   }
  
- 
+  function AddCarrito() {
+    const isFound = carrito.some(element => {
+      if (element.id === productos.id) {
+        element.cant = uni
+        return true
+      }
+      return false;
+    })
+  
+    if (!isFound) {
+      setCarrito(current => [...current, 
+        { id: productos.id,
+          title: productos.title,
+          image: productos.images[0],
+          price: productos.price,
+          cant: uni
+        }]);
+    } 
+  }
  
   return (
     <>
@@ -62,6 +83,17 @@ export default function Producto() {
         >
           {productos.description}
         </Typography>
+        <Stack direction='row' spacing={2} sx={{p:3}}>
+        <Button sx={{p:3}}
+          onClick={() => AddCarrito()}
+          >
+          Agregar producto
+        </Button>
+        <TextField sx={{width:50}} justifyContent='center' value={uni}
+          onChange={(e) => setUni(parseInt(e.target.value))}
+        >
+        </TextField>
+        </Stack>
         </Box>
       </Stack>
     </>

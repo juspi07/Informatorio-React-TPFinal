@@ -30,7 +30,7 @@ const Cards = ({ results }) => {
         <Card key={id} sx={{ width: "10%" }}>
           <CardActionArea
             onClick={() => {
-              window.filtro = { name };
+              localStorage.setItem('filtro', name)
             }}
             component={Link}
             to={`/products`}

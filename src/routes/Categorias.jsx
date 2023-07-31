@@ -1,23 +1,51 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import Appbar from '../components/appbar'
-import { Typography, Box, Stack } from '@mui/material'
+import { Typography, Box, Stack, Skeleton } from '@mui/material'
 import Cards from "../components/cards";
+import { useQuery, useMutation } from 'react-query';
+import { useNavigate } from 'react-router';
 
 
 export default function Categorias() {
     let [fetchedData, updateFetchedData] = useState([]);
-    let api = "https://api.escuelajs.co/api/v1/categories/"
-
-    useEffect(() => {
-        (async function () {
-          let data = await fetch(api).then((res) => 
-          {return res.json()})     
-          updateFetchedData(data);
-        })();
-      }, [api]);
-
-
+    const api = "https://api.escuelajs.co/api/v1/categories/"
+    const navigate = useNavigate()
     
+    const FetchQuery = useQuery(
+      ["categorias"], async () => {
+        const res = await fetch(api)
+        const json = await res.json()
+        updateFetchedData(json)
+      }
+    )
+    
+    const PostData = async () => {
+      const response = await fetch("https://api.escuelajs.co/api/v1/users/is-available", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          'email': Email,
+        }),
+      });
+      return await response.json();
+    }
+
+
+    const Loading = () => {
+      let items = [];
+      for (let index = 0; index < 20; index++) {
+        items.push(<Skeleton variant="rectangular" width={310} height={218} />)
+      }
+      return (items)
+    }
+
+    if (FetchQuery.status == 'error') {
+      navigate('*')
+    }
+
+
     return (
         <>
         <Appbar/>
@@ -36,7 +64,10 @@ export default function Categorias() {
         flexWrap="wrap"
         direction="row"
       >
-      <Cards results={fetchedData} />
+      {FetchQuery.isLoading ?  
+       <Loading/> :
+       <Cards results={fetchedData} />
+      }
       </Stack>
       </Stack>
         </>

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Avatar,
   Button,
@@ -11,55 +11,70 @@ import {
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { useQuery, useMutation } from "react-query";
 
 export default function Ingreso() {
-  const navigate = useNavigate();
-  const [Email, setEmail] = useState("");
-  const [Pw, setPw] = useState("");
-  const [error, setError] = useState(false);
+  const navigate = useNavigate()
+  const [Email, setEmail] = useState("")
+  const [Pw, setPw] = useState("")
+  const [error, setError] = useState(false)
   const [flag, setFlag] = useState(false)
 
-  
-  
-  const handleSubmit = async (event) => {
-    try {
-        event.preventDefault();
-        await fetch("https://api.escuelajs.co/api/v1/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          'email': Email,
-          'password': Pw,
-        }),
+
+  const PostData = async () => {
+    const response = await fetch("https://api.escuelajs.co/api/v1/auth/login", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        'email': Email,
+        'password': Pw,
+      }),
+    });
+    return await response.json();
+  }
+
+  const { mutate: doPost } = useMutation(PostData, {
+    onError: (err) => console.log("The error", err),
+    onSuccess: (D) => {
+      if (!(D.message == 'Unauthorized')) {
+        localStorage.setItem("Atoken", D.access_token)
+      }
+      else {
+        setFlag(!flag)
+      }
+    }
+  })
+
+  const QueryR = useQuery({
+    queryKey: ['Role'],
+    queryFn: async () => {
+      const res =  await fetch("https://api.escuelajs.co/api/v1/auth/profile", {
+        headers: { Authorization: `Bearer ${localStorage.getItem('Atoken')}` },
       })
-        .then((response) => response.json())
-        .then((json) => { 
-            if (!(json.message == 'Unauthorized')) {
-            localStorage.setItem("Atoken", json.access_token)
-            fetch("https://api.escuelajs.co/api/v1/auth/profile", {
-            headers: { Authorization: `Bearer ${json.access_token}` },
-            })
-            .then((response) => response.json())
-            .then((json) => {
-                console.log(json)
-                localStorage.setItem("Role", json.role)
-            })
-            navigate('/')}
-            else {
-                setFlag(!flag)
-            }
-        });
-    } catch (err) { console.log(err)}
-  };
+      const json =  await res.json()
+      localStorage.setItem("Role", json.role)
+      navigate('/')
+    },
+    enabled: 'Atoken' in localStorage,
+  })
+  
+    
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    doPost({ Email, Pw })
+  }
 
   useEffect(() => {
     if (localStorage.getItem('Atoken')) {
-        navigate('/')
+      navigate('/')
     }
-  },[])
+  }, [])
 
-  
- return (
+
+  return (
     <Container sx={{ marginX: 90 }} component="main" maxWidth="xs">
       <Box
         sx={{
@@ -79,7 +94,7 @@ export default function Ingreso() {
           <TextField
             margin="normal"
             required
-            error = {error}
+            error={error}
             fullWidth
             id="email"
             label="Email"
@@ -87,12 +102,12 @@ export default function Ingreso() {
             autoComplete="email"
             autoFocus
             onChange={(e) => {
-                setEmail(e.target.value);
+              setEmail(e.target.value);
             }}> {Email} </TextField>
           <TextField
             margin="normal"
             required
-            error = {error}
+            error={error}
             fullWidth
             name="password"
             label="Contraseña"
@@ -100,7 +115,7 @@ export default function Ingreso() {
             id="password"
             autoComplete="current-password"
             onChange={(e) => {
-                setPw(e.target.value);
+              setPw(e.target.value);
             }}> {Pw} </TextField>
           <Button
             type="submit"
@@ -128,7 +143,7 @@ export default function Ingreso() {
         open={flag}
         autoHideDuration={6000}
         onClose={() => setFlag(!flag)}
-        message={'Error en autentificar'}/>
+        message={'Error en autentificar'} />
     </Container>
   );
 }
