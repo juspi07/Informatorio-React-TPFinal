@@ -11,7 +11,6 @@ import Producto from "./routes/Producto"
 import AddProducto from "./routes/AddProducto"
 import EditProducto from "./routes/EditProducto"
 import Carrito from "./routes/Carrito"
-import Exito from "./routes/Exito"
 import EditCategoria from './routes/EditCategoria'
 import Error404 from './routes/Error404'
 import { QueryClient, QueryClientProvider } from 'react-query'
@@ -76,10 +75,6 @@ const router = createBrowserRouter([
   {
     path: "/cart-detail",
     element: <Carrito />,
-  },
-  {
-    path: "/success",
-    element: <Exito />,
   },
   {
     path: "*",
