@@ -1,10 +1,10 @@
 import React, { useContext, useState } from 'react';
-import { Box, Button, Stack, Typography, Container} from '@mui/material'
+import Box from '@mui/material/Box';
+import { Stack, Typography, Container} from '@mui/material'
 import Appbar from '../components/appbar'
 import UserContext from '../components/context'
 import CarritoItem from '../components/carritoitem'
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 
 
@@ -12,20 +12,12 @@ import { useNavigate } from 'react-router-dom';
 export default function Carrito() {
     const { carrito, setCarrito } = useContext(UserContext);
     const [ total, setTotal ] = useState(0)
-    const navigate = useNavigate()
-    const [ bandera, setBandera ] = useState(true)
-    
+
     useEffect(() => { 
         setTotal(0)   
         carrito.map(elem => {
         setTotal(e => e + (elem.cant * elem.price))
-    })
-        if (carrito.length > 0 ) {
-            setBandera(false)
-        } else {
-            setBandera(true)
-        }
-    },[carrito])
+    })},[carrito])
 
     return (
         <>
@@ -49,11 +41,7 @@ export default function Carrito() {
                         Total : $ {total}
                     </Typography>
                 </Box>
-
             </Stack>
-            <Button disabled={bandera} onClick={() => {navigate('/success')}} sx={{left:950, marginTop:5}} size='large' color='secondary'>
-                    REALIZAR COMPRA
-            </Button>
         </>
     )
 }
