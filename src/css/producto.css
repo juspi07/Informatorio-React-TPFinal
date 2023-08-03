@@ -1,0 +1,26 @@
+#info {
+    margin-left: 300px;
+    min-width: 3000px;
+}
+
+#context {
+    display: flex;
+    flex-direction: row;
+}
+
+#cover {
+    width: 500px;
+    height: 500px;
+    margin: 0 auto;
+  }
+  
+  #cover > img {
+    float: left;
+    border: 2px solid black;
+    width: 45%;
+    margin: 1.66%;
+  }
+
+  #input {
+    color: black;
+  }
