@@ -1,26 +1,25 @@
 ## Trabajo Practico INFORMATORIO - CHACO - REACT
 
-Asegurese de ver el branch Nro 6 (que es la ultima etapa)
+Make sure to view Branch No. 6 (which is the final stage)
+
+### Context:
+
+A product E-commerce website was requested with the following requirements:
+
+- All the website's data had to be embedded from an API (https://api.escuelajs.co/docs)
+- Products had to be filterable by specific attributes
+- Each product needed its own detailed view
+- The website should include a simple login system to identify users and allow new user registrations
+- Users with admin roles had to be able to modify product details like name and price
+- The website also needed a category-based search function
+- A shopping cart was required, allowing products to be added, removed, and their quantities updated
 
 
+## Images: (Reminder: this was an educational project only)
 
+![](https://i.imgur.com/PZrXiw6.jpeg)
+![](https://i.imgur.com/G5CWL04.jpeg)
 
-### Contexto:
-
-Se pidió una web E-commerce de productos:
-
-	- Toda la informacion de la web se debía embeber de una API (https://api.escuelajs.co/docs)
-	- Los productos debian poderse filtrar por algunos aspectos
-	- Cada producto tenia que tener su vista singular
-	- La web debería contar con un login simple para identificar usuarios y poder registrar nuevos usuarios
-	- El usuario con rol de administrador debia poder cambiar los los productos como su nombre y precio
-	- La web tambien debía contar con un buscador por categorias
-    	- La web debía contar con un carrito para agregar productos, poder eliminarlos y cambiar cantidades
-
-
-
-
-
-
+All others images: https://imgur.com/a/xWTD7YI
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
